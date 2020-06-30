@@ -155,7 +155,7 @@ opencage_key <- function(quiet = TRUE) {
 #'
 #' @export
 #' @keywords internal
-#' @rdname
+#' @rdname deprecated
 opencage_format <- function(lst) {
   lifecycle::deprecate_warn("0.2.0", "opencage_format()")
 
