@@ -1,20 +1,11 @@
 #' Deprecated functions in opencage
 #'
-#' These functions still work but will be removed (defunct) in the next version.
+#' @description
+#' `r lifecycle::badge("deprecated")`
 #'
-#' \itemize{
-#'  \item [opencage_forward()]
-#'  \item [opencage_reverse()]
-#'  \item [opencage_key()]
-#' }
+#' Use `oc_forward()` instead of `opencage_forward()`.
 #'
-#' @name opencage-deprecated
-NULL
-
-#' Forward geocoding
-#'
-#' Deprecated: use `oc_forward` or `oc_forward_df` for forward geocoding.
-#'
+#' @param placename Placename
 #' @param key Your OpenCage API key as a character vector of length one. By
 #'   default, [opencage_key()] will attempt to retrieve the key from the
 #'   environment variable `OPENCAGE_KEY`.
@@ -23,26 +14,9 @@ NULL
 #'   cached by OpenCage.
 #' @inheritParams oc_forward
 #'
-#' @return A list with
-#' \itemize{
-#' \item results as a tibble with one line per result,
-#' \item the number of results as an integer,
-#' \item the timestamp as a POSIXct object,
-#' \item rate_info tibble/data.frame with the maximal number of API calls  per
-#' day for the used key, the number of remaining calls for the day and the time
-#' at which the number of remaining calls will be reset.
-#' }
 #' @export
-#'
-#' @examples
-#' \dontrun{
-#' opencage_forward(placename = "Sarzeau")
-#' opencage_forward(placename = "Islington, London")
-#' opencage_forward(placename = "Triererstr 15,
-#'                               Weimar 99423,
-#'                               Deutschland")
-#' }
-#'
+#' @keywords internal
+#' @name deprecated
 opencage_forward <-
   function(placename,
            key = opencage_key(),
@@ -56,14 +30,14 @@ opencage_forward <-
            no_record = FALSE,
            abbrv = FALSE,
            add_request = TRUE) {
+
     if (length(placename) > 1) {
       stop(
         call. = FALSE,
         "`opencage_forward` is not vectorised; use `oc_forward` instead."
       )
     }
-
-    .Deprecated("oc_forward")
+    lifecycle::deprecate_warn("0.2.0", "opencage_forward()", "oc_forward()")
 
     oc_config(key = key, no_record = no_record)
 
@@ -84,10 +58,8 @@ opencage_forward <-
     opencage_format(lst)
   }
 
-
-#' Reverse geocoding
-#'
-#' Deprecated: use `oc_reverse` or `oc_reverse_df` for reverse geocoding.
+#' @description
+#' Use `oc_reverse()` instead of `opencage_reverse()`.
 #'
 #' @param bounds Bounding box, ignored for reverse geocoding.
 #' @param countrycode Country code, ignored for reverse geocoding.
@@ -101,11 +73,21 @@ opencage_forward <-
 #'
 #' @examples
 #' \dontrun{
+#' opencage_forward(placename = "Sarzeau")
+#' opencage_forward(placename = "Islington, London")
+#' opencage_forward(placename = "Triererstr 15,
+#'                               Weimar 99423,
+#'                               Deutschland")
+#'
 #' opencage_reverse(
 #'   latitude = 0, longitude = 0,
 #'   limit = 2
 #' )
 #' }
+#'
+#' @export
+#' @keywords internal
+#' @rdname deprecated
 opencage_reverse <-
   function(latitude,
            longitude,
@@ -120,6 +102,7 @@ opencage_reverse <-
            no_record = FALSE,
            abbrv = FALSE,
            add_request = TRUE) {
+
     if (length(latitude) > 1) {
       stop(
         call. = FALSE,
@@ -127,7 +110,7 @@ opencage_reverse <-
       )
     }
 
-    .Deprecated("oc_reverse")
+    lifecycle::deprecate_warn("0.2.0", "opencage_reverse()", "oc_reverse()")
 
     oc_config(key = key, no_record = no_record)
 
@@ -146,10 +129,36 @@ opencage_reverse <-
     lst <- lst[[1]]
     opencage_format(lst)
   }
+#' @description
+#' Use `oc_config()` instead of `opencage_key()`.
+#'
+#' @export
+#' @keywords internal
+#' @rdname deprecated
+opencage_key <- function(quiet = TRUE) {
+  lifecycle::deprecate_warn("0.2.0", "opencage_key()", "oc_config()")
 
-# format to "old" style (version <= 0.1.4)
-# for opencage_forward, opencage_reverse
+  pat <- Sys.getenv("OPENCAGE_KEY")
+
+  if (identical(pat, "")) {
+    return(NULL)
+  }
+
+  if (!quiet) {
+    message("Using OpenCage API Key from envvar OPENCAGE_KEY")
+  }
+
+  return(pat)
+}
+#' @description
+#' `opencage_format()` is no longer necessary.
+#'
+#' @export
+#' @keywords internal
+#' @rdname
 opencage_format <- function(lst) {
+  lifecycle::deprecate_warn("0.2.0", "opencage_format()")
+
   no_results <- lst[["total_results"]]
   if (no_results > 0) {
     results <- lapply(lst[["results"]], unlist)
@@ -192,32 +201,4 @@ opencage_format <- function(lst) {
     ),
     rate_info = rate_info
   )
-}
-
-#' Retrieve Opencage API key
-#'
-#' @description Deprecated and will be removed from the package together with
-#'   `opencage_forward` and `opencage_reverse`.
-#'
-#'   Retrieves the OpenCage API Key from the environment variable
-#'   `OPENCAGE_KEY`.
-#'
-#' @param quiet Logical vector of length one indicating whether the key is
-#'   returned quietly or whether a message is printed.
-#' @keywords internal
-#' @export
-opencage_key <- function(quiet = TRUE) {
-  .Deprecated()
-
-  pat <- Sys.getenv("OPENCAGE_KEY")
-
-  if (identical(pat, "")) {
-    return(NULL)
-  }
-
-  if (!quiet) {
-    message("Using OpenCage API Key from envvar OPENCAGE_KEY")
-  }
-
-  return(pat)
 }
