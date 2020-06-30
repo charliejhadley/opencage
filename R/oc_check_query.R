@@ -161,7 +161,7 @@ oc_check_query <-
 
     # check countrycode
     if (!is.null(countrycode)) {
-      if (!(all(toupper(unlist(countrycode)) %in% countrycodes$code))) {
+      if (!(all(toupper(unlist(countrycode)) %in% country_codes$country_code))) {
         stop("Every `countrycode` must be valid. ",
           "See `data('countrycodes')` for valid values.",
           call. = FALSE
